@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Tipping Point</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* HERO */
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 5rem;
+  font-weight: 800;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: 1.5s ease;
+}
+
+.hero p {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #aaa;
+  opacity: 0;
+  transition: 2s ease;
+}
+
+.hero.show h1,
+.hero.show p {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* SECTION */
+.section {
+  min-height: 100vh;
+  padding: 100px 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+}
+
+.section.dark {
+  background: #050505;
+}
+
+h2 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+p {
+  max-width: 600px;
+  color: #bbb;
+  line-height: 1.6;
+}
+
+/* STAT */
+.stat {
+  font-size: 6rem;
+  font-weight: 800;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: 1s ease;
+}
+
+.stat.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* IMAGE REVEAL */
+.image {
+  margin-top: 40px;
+  width: 80%;
+  max-width: 800px;
+  opacity: 0;
+  transform: translateY(60px);
+  transition: 1.2s ease;
+}
+
+.image img {
+  width: 100%;
+  border-radius: 20px;
+}
+
+.image.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* FINAL CTA */
+.cta {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-top: 30px;
+  opacity: 0;
+  transition: 1.5s ease;
+}
+
+.cta.show {
+  opacity: 1;
+}
+
+/* FADE BLACK TRANSITION */
+.fade-black {
+  height: 100vh;
+  background: linear-gradient(to bottom, transparent, black);
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>This is Earth.</h1>
+  <p>It’s the only one we have.</p>
+</section>
+
+<!-- CALM -->
+<section class="section">
+  <h2>For thousands of years...</h2>
+  <p>The climate was stable. Predictable. Safe.</p>
+</section>
+
+<!-- SHIFT -->
+<section class="section dark">
+  <h2>Then something changed.</h2>
+  <div class="image">
+    <img src="https://images.unsplash.com/photo-1509395176047-4a66953fd231">
+  </div>
+</section>
+
+<!-- STAT -->
+<section class="section">
+  <div class="stat">+1.5°C</div>
+  <p>That small number is changing everything.</p>
+</section>
+
+<!-- IMPACT -->
+<section class="section dark">
+  <h2>Not in the future.</h2>
+  <p>Right now.</p>
+  <div class="image">
+    <img src="https://images.unsplash.com/photo-1569163139394-de44cb5894f8">
+  </div>
+</section>
+
+<!-- TENSION -->
+<section class="section">
+  <h2>Wildfires. Floods. Heatwaves.</h2>
+  <p>These are not isolated events. They are signals.</p>
+</section>
+
+<!-- PAUSE -->
+<section class="fade-black"></section>
+
+<!-- TURNING POINT -->
+<section class="section">
+  <h2>But here’s the truth.</h2>
+  <p>We are not powerless.</p>
+</section>
+
+<!-- HOPE -->
+<section class="section dark">
+  <h2>The same species that caused this…</h2>
+  <p>Can fix it.</p>
+</section>
+
+<!-- FINAL CTA -->
+<section class="section">
+  <h2>The future isn’t written.</h2>
+  <div class="cta">It’s designed by us.</div>
+</section>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('show');
+    }
+  });
+}, { threshold: 0.4 });
+
+document.querySelectorAll('.hero, .stat, .image, .cta').forEach(el => {
+  observer.observe(el);
+});
+</script>
+
+</body>
+</html>
