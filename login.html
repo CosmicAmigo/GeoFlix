@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoflix | Login & Signup</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="logo">GEOFLIX</div>
+    </header>
+
+    <main class="auth-container">
+        <section class="auth-forms">
+            <h2>Welcome Back</h2>
+            <p>How can we cool the planet without cooling progress? [cite: 7]</p>
+            
+            <div class="form-group">
+                <input type="email" placeholder="Email Address">
+                <input type="password" placeholder="Password">
+                <button class="btn-main">Login</button>
+            </div>
+
+            <div class="divider"><span>OR</span></div>
+
+            <div id="google-btn-wrapper">
+                <div id="g_id_onload"
+                     data-client_id="1013247124732-gicp81d2g3etudk40shi2aeh20tdar6g.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse">
+                </div>
+                <div class="g_id_signin" data-type="standard"></div>
+            </div>
+
+            <p class="toggle-text">Don't have an account? <a href="#">Sign up</a></p>
+        </section>
+
+        <section class="tree-sidebar">
+            <div class="watering-can" id="watering-can">💧</div>
+            <div class="sapling-container">
+                <div class="sapling" id="sapling">🌱</div>
+                <div class="dirt"></div>
+            </div>
+            <p class="tree-caption">Hover over Google Sign-in to water progress!</p>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

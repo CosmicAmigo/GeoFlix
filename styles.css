@@ -58,3 +58,166 @@
     background-color: #0056b3;
     transform: translateY(-1px);
 }
+
+/* Color Variables */
+:root {
+    --alabaster: #F5F5F1;
+    --charcoal-pine: #2D3A3A;
+    --moss-green: #588157;
+    --eucalyptus: #A3B18A;
+    --terracotta: #BC6C25;
+}
+
+body {
+    background-color: var(--alabaster);
+    color: var(--charcoal-pine);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* 1. Header Styles */
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 5%;
+    align-items: center;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--moss-green);
+}
+
+.hero {
+    text-align: center;
+    padding: 60px 10%;
+    border: 2px solid var(--eucalyptus);
+    margin: 20px 5%;
+    border-radius: 8px;
+}
+
+/* 2. Highlights (The Circles) */
+.highlights {
+    display: flex;
+    justify-content: space-around;
+    padding: 40px 5%;
+    flex-wrap: wrap;
+}
+
+.highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--moss-green);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* 3. Central Banner */
+.central-banner {
+    background-color: var(--eucalyptus);
+    color: var(--charcoal-pine);
+    text-align: center;
+    padding: 40px 5%;
+    margin-top: 20px;
+}
+
+.central-banner h2 {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Auth Container Layout */
+.auth-container {
+    display: flex;
+    max-width: 1000px;
+    margin: 50px auto;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.auth-forms {
+    flex: 1;
+    padding: 60px;
+}
+
+.tree-sidebar {
+    flex: 0.8;
+    background-color: var(--eucalyptus);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 40px;
+}
+
+/* Form Styling */
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.btn-main {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--moss-green);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Interactive Sapling Styles */
+.sapling {
+    font-size: 80px;
+    transition: transform 0.5s ease;
+}
+
+.watering-can {
+    font-size: 40px;
+    position: absolute;
+    top: 20%;
+    opacity: 0;
+    transition: all 0.5s ease;
+    transform: rotate(0deg);
+}
+
+/* Watering Animation Class */
+.is-watering .watering-can {
+    opacity: 1;
+    top: 35%;
+    transform: rotate(-45deg);
+}
+
+.is-watering .sapling {
+    transform: scale(1.2);
+}
+
+.dirt {
+    width: 100px;
+    height: 20px;
+    background: #6B705C;
+    border-radius: 50%;
+    margin-top: -10px;
+}
