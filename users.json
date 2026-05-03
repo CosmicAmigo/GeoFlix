@@ -1,0 +1,18 @@
+{
+  "sam@gmail.com": {
+    "id": "1777715895962",
+    "email": "sam@gmail.com",
+    "name": "camigo",
+    "password": "$2a$10$z7BQ9UlFzhJvyPJo.6hiJOGEnCn4IuAGiW6zAa0JlKbUW7d7f79bG",
+    "carbonFootprint": 0.2,
+    "actions": [
+      {
+        "id": "1777715937245",
+        "action": "Used public transport",
+        "impact": 0.2,
+        "date": "2026-05-02T09:58:57.245Z"
+      }
+    ],
+    "createdAt": "2026-05-02T09:58:15.962Z"
+  }
+}
