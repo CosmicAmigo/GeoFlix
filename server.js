@@ -119,6 +119,39 @@ app.get('/api/leaderboard', async (req, res) => {
     }
 });
 
+// 5. USER PROFILE API
+app.get('/api/profile', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const token = authHeader.substring(7);
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const email = decoded.email;
+        // Get user
+        const [userRows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+        if (userRows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const user = userRows[0];
+        // Get points and rank from leaderboard
+        const [pointRows] = await pool.execute('SELECT SUM(physical_points + virtual_points) as total_points FROM leaderboard WHERE user_id = ?', [user.id]);
+        const totalPoints = pointRows[0]?.total_points || 0;
+        // Get rank
+        const [rankRows] = await pool.execute('SELECT COUNT(*) + 1 as rank FROM (SELECT user_id, SUM(physical_points + virtual_points) as total FROM leaderboard GROUP BY user_id HAVING total > ?) as higher', [totalPoints]);
+        const rank = rankRows[0]?.rank || 1;
+        res.json({
+            name: user.name,
+            email: user.email,
+            points: totalPoints,
+            rank: rank
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });

@@ -341,3 +341,55 @@ body {
 #leaderboard tbody tr:nth-child(even):hover {
     background-color: var(--beige-bg);
 }
+
+/* Dashboard Styles */
+.dashboard-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 40px;
+    background-color: var(--white-secondary);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(52, 103, 57, 0.15);
+    text-align: center;
+}
+
+.dashboard-container h1 {
+    color: var(--green-text);
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+}
+
+.points-rank {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+    font-size: 1.2rem;
+    color: var(--green-text);
+}
+
+.points-rank div {
+    background-color: var(--beige-bg);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--light-green-primary);
+    min-width: 150px;
+}
+
+.points-rank span {
+    font-weight: bold;
+    color: var(--green-text);
+}
+
+.dashboard-container .btn-main {
+    display: block;
+    margin: 20px auto;
+    width: 200px;
+}
+
+.loading {
+    text-align: center;
+    padding: 100px 20px;
+    color: var(--green-text);
+    font-size: 1.5rem;
+}
