@@ -12,6 +12,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'geoflix-default-secret';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // 1. DATABASE CONNECTION (Using your DATABASE_URL)
+if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is not set. Please configure it in your deployment environment.');
+    process.exit(1);
+}
 const pool = mysql.createPool(process.env.DATABASE_URL + "?ssl-mode=REQUIRED");
 
 app.use(cors());
