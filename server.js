@@ -20,7 +20,7 @@ const pool = mysql.createPool(process.env.DATABASE_URL + "?ssl-mode=REQUIRED");
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'dist'))); // Serve Vite build
+app.use(express.static(path.join(__dirname))); // Serve static files from root
 
 // 2. GOOGLE LOGIN ROUTE
 app.post('/api/google-login', async (req, res) => {
@@ -120,7 +120,7 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => console.log(`Geoflix running on port ${PORT}`));
