@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="leaderboard-container">
+        <h1>Leaderboard</h1>
+        <div class="leaderboard-filters">
+            <label for="pointType">Point Type:</label>
+            <select id="pointType">
+                <option value="both">Both</option>
+                <option value="physical">Physical</option>
+                <option value="virtual">Virtual</option>
+            </select>
+            <label for="timePeriod">Time Period:</label>
+            <select id="timePeriod">
+                <option value="1week">1 Week</option>
+                <option value="1month">1 Month</option>
+                <option value="1year">1 Year</option>
+                <option value="lifetime">Lifetime</option>
+            </select>
+            <button id="updateBtn">Update</button>
+        </div>
+        <table id="leaderboard">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Points</th>
+                    <th>Account Age (days)</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+    <script src="lb.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Tree Growth Simulator - Upgrades</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+        text-align: center;
+        padding: 20px;
+    }
+    .card {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 12px;
+        width: 420px;
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    button {
+        margin: 5px;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: #38bdf8;
+        color: black;
+        font-weight: bold;
+        width: 180px;
+    }
+    button:hover {
+        background: #0ea5e9;
+    }
+    .shop button {
+        background: #a3e635;
+    }
+    .shop button:hover {
+        background: #84cc16;
+    }
+    .stats {
+        text-align: left;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🌳 Tree Growth Simulator</h2>
+
+    <p id="stage">Stage: Sapling</p>
+
+    <div class="stats">
+        <p>Age: <span id="age">0</span> days</p>
+        <p>Height: <span id="height">1</span> m</p>
+        <p>Points: <span id="points">0</span></p>
+        <p>Leaves: <span id="leaves">0</span></p>
+        <p>Mulch: <span id="mulch">0</span></p>
+        <p>Saplings Dropped: <span id="saplings">0</span></p>
+    </div>
+
+    <hr>
+
+    <button onclick="water()">💧 Water</button>
+    <button onclick="weed()">🌿 Weed</button>
+    <button onclick="fertilize()">🧪 Fertilize</button>
+    <button onclick="removeLeaves()">🍃 Remove Leaves</button>
+
+    <h3>🛠 Tools</h3>
+    <p>Watering Can Level: <span id="waterLevel">1</span></p>
+    <p>Fertilizer Level: <span id="fertLevel">1</span></p>
+
+    <div class="shop">
+        <button onclick="upgradeWater()">Upgrade Watering Can (10 pts)</button>
+        <button onclick="upgradeFertilizer()">Upgrade Fertilizer (15 pts)</button>
+    </div>
+
+    <p id="message"></p>
+</div>
+
+<script>
+let age = 0;
+let height = 1;
+let points = 0;
+let leaves = 0;
+let mulch = 0;
+let saplings = 0;
+
+let watered = false;
+let fertilized = false;
+
+let waterLevel = 1;
+let fertLevel = 1;
+
+function updateUI() {
+    document.getElementById("age").innerText = age;
+    document.getElementById("height").innerText = height.toFixed(1);
+    document.getElementById("points").innerText = points;
+    document.getElementById("leaves").innerText = leaves;
+    document.getElementById("mulch").innerText = mulch;
+    document.getElementById("saplings").innerText = saplings;
+
+    document.getElementById("waterLevel").innerText = waterLevel;
+    document.getElementById("fertLevel").innerText = fertLevel;
+
+    let stage = "Sapling";
+    if (age > 30) stage = "Young Tree";
+    if (age > 80) stage = "Mature Tree";
+    if (age > 150) stage = "Ancient Tree";
+
+    document.getElementById("stage").innerText = "Stage: " + stage;
+}
+
+function water() {
+    watered = true;
+    document.getElementById("message").innerText = "You watered the tree 💧";
+}
+
+function weed() {
+    points += 2;
+    document.getElementById("message").innerText = "Weeds cleared 🌿 (+2 points)";
+    updateUI();
+}
+
+function fertilize() {
+    fertilized = true;
+    document.getElementById("message").innerText = "Fertilizer applied 🧪";
+}
+
+function removeLeaves() {
+    points += leaves;
+    leaves = 0;
+    document.getElementById("message").innerText = "Leaves collected 🍃";
+    updateUI();
+}
+
+function upgradeWater() {
+    if (points >= 10) {
+        points -= 10;
+        waterLevel++;
+        document.getElementById("message").innerText = "💧 Watering Can upgraded!";
+        updateUI();
+    } else {
+        document.getElementById("message").innerText = "Not enough points!";
+    }
+}
+
+function upgradeFertilizer() {
+    if (points >= 15) {
+        points -= 15;
+        fertLevel++;
+        document.getElementById("message").innerText = "🧪 Fertilizer upgraded!";
+        updateUI();
+    } else {
+        document.getElementById("message").innerText = "Not enough points!";
+    }
+}
+
+function growTree() {
+    age++;
+
+    // scaling upgrades
+    let growth = 0.2 + (waterLevel * 0.15);
+
+    if (watered) growth += 0.3 * waterLevel;
+    if (fertilized) growth += 0.5 * fertLevel;
+
+    height += growth;
+
+    watered = false;
+    fertilized = false;
+
+    // leaves
+    let newLeaves = Math.floor(Math.random() * (2 + fertLevel));
+    leaves += newLeaves;
+
+    // mulch conversion
+    if (leaves > 10) {
+        let converted = Math.floor(leaves / 2);
+        mulch += converted;
+        leaves -= converted;
+    }
+
+    // sapling drops
+    if (age > 80 && Math.random() < 0.3) {
+        saplings++;
+        document.getElementById("message").innerText = "🌱 Sapling dropped!";
+    }
+
+    // points scaling
+    points += Math.floor(height / 6);
+
+    updateUI();
+}
+
+setInterval(growTree, 1500);
+
+updateUI();
+</script>
+
+</body>
+</html>

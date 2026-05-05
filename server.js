@@ -67,6 +67,54 @@ app.post('/api/actions', async (req, res) => {
     }
 });
 
+// 4. LEADERBOARD API
+async function getLeaderboardData(pointType, timePeriod) {
+    let whereClause = '';
+    if (timePeriod !== 'lifetime') {
+        const interval = timePeriod === '1week' ? '1 WEEK' : timePeriod === '1month' ? '1 MONTH' : '1 YEAR';
+        whereClause = `WHERE l.created_at >= DATE_SUB(NOW(), INTERVAL ${interval})`;
+    }
+
+    let selectPoints = '';
+    if (pointType === 'physical') {
+        selectPoints = 'SUM(l.physical_points)';
+    } else if (pointType === 'virtual') {
+        selectPoints = 'SUM(l.virtual_points)';
+    } else { // both
+        selectPoints = 'SUM(l.physical_points + l.virtual_points)';
+    }
+
+    const query = `
+        SELECT u.name as username, ${selectPoints} as score, 
+               TIMESTAMPDIFF(DAY, u.account_created_at, NOW()) as account_age,
+               ROW_NUMBER() OVER (ORDER BY ${selectPoints} DESC) as rank
+        FROM leaderboard l
+        JOIN users u ON l.user_id = u.id
+        ${whereClause}
+        GROUP BY u.id, u.name, u.account_created_at
+        ORDER BY score DESC
+    `;
+
+    try {
+        const [rows] = await pool.execute(query);
+        return rows;
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        throw error;
+    }
+}
+
+app.get('/api/leaderboard', async (req, res) => {
+    const pointType = req.query.pointType || 'both';
+    const timePeriod = req.query.timePeriod || '1week';
+    try {
+        const data = await getLeaderboardData(pointType, timePeriod);
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
+});
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
