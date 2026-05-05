@@ -1,169 +1,74 @@
 const express = require('express');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const session = require('express-session');
-const fs = require('fs');
+const { OAuth2Client } = require('google-auth-library');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'geoflix-default-secret';
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Middleware
+// 1. DATABASE CONNECTION (Using your DATABASE_URL)
+const pool = mysql.createPool(process.env.DATABASE_URL + "?ssl-mode=REQUIRED");
+
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: 'climate-action-session',
-  resave: false,
-  saveUninitialized: false
-}));
+app.use(express.static(path.join(__dirname, 'dist'))); // Serve Vite build
 
-// Serve static files
-app.use(express.static(path.join(__dirname)));
+// 2. GOOGLE LOGIN ROUTE
+app.post('/api/google-login', async (req, res) => {
+    try {
+        const { token } = req.body;
+        const ticket = await googleClient.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const { email, name } = ticket.getPayload();
 
-// Simple file-based user storage (replace with database in production)
-const USERS_FILE = path.join(__dirname, 'users.json');
+        // Check if user exists in MySQL
+        let [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+        let user = rows[0];
 
-// Helper functions
-const readUsers = () => {
-  try {
-    const data = fs.readFileSync(USERS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {};
-  }
-};
+        if (!user) {
+            // Create user if they don't exist
+            await pool.execute(
+                'INSERT INTO users (email, name, carbonFootprint) VALUES (?, ?, ?)',
+                [email, name, 0]
+            );
+            [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+            user = rows[0];
+        }
 
-const writeUsers = (users) => {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-};
-
-// Routes
-app.post('/api/register', async (req, res) => {
-  try {
-    const { email, password, name } = req.body;
-    const users = readUsers();
-
-    if (users[email]) {
-      return res.status(400).json({ error: 'User already exists' });
+        const sessionToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token: sessionToken, user });
+    } catch (error) {
+        res.status(500).json({ error: 'Google Auth failed' });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    users[email] = {
-      id: Date.now().toString(),
-      email,
-      name,
-      password: hashedPassword,
-      carbonFootprint: 0,
-      actions: [],
-      createdAt: new Date().toISOString()
-    };
-
-    writeUsers(users);
-    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({
-      token,
-      user: {
-        id: users[email].id,
-        email,
-        name,
-        carbonFootprint: users[email].carbonFootprint
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Registration failed' });
-  }
 });
 
-app.post('/api/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const users = readUsers();
-    const user = users[email];
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+// 3. ACTION LOGGING (From your project guide)
+app.post('/api/actions', async (req, res) => {
+    const { email, action, impact } = req.body; // In production, get email from JWT
+    try {
+        await pool.execute(
+            'INSERT INTO actions (user_email, action_name, impact_value) VALUES (?, ?, ?)',
+            [email, action, impact]
+        );
+        await pool.execute(
+            'UPDATE users SET carbonFootprint = carbonFootprint + ? WHERE email = ?',
+            [impact, email]
+        );
+        res.json({ message: 'Action logged to AivenDB successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database update failed' });
     }
-
-    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        carbonFootprint: user.carbonFootprint
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Login failed' });
-  }
 });
 
-// Middleware to verify JWT
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid token' });
-    }
-    req.user = user;
-    next();
-  });
-};
-
-app.get('/api/profile', authenticateToken, (req, res) => {
-  const users = readUsers();
-  const user = users[req.user.email];
-
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
-
-  res.json({
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    carbonFootprint: user.carbonFootprint,
-    actions: user.actions
-  });
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.post('/api/actions', authenticateToken, (req, res) => {
-  const { action, impact } = req.body;
-  const users = readUsers();
-  const user = users[req.user.email];
-
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
-
-  user.actions.push({
-    id: Date.now().toString(),
-    action,
-    impact,
-    date: new Date().toISOString()
-  });
-
-  user.carbonFootprint += impact;
-  writeUsers(users);
-
-  res.json({ message: 'Action logged successfully' });
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Geoflix running on port ${PORT}`));
